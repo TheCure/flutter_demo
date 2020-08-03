@@ -27,8 +27,6 @@ class _HomeContentPage extends State<HomePage> {
   int _index = 0;
   List<Widget> _pages;
   var _title = ['资讯', '动弹', '发现', '我的'];
-  Color themeColor = ThemeUtils.currentColorTheme;
-  var _colorSubscription;
 
   @override
   void initState() {
@@ -39,19 +37,12 @@ class _HomeContentPage extends State<HomePage> {
       DiscoveryPage(),
       MyInfoPage()
     ];
-    _colorSubscription =
-        Constants.eventBus.on<ChangeThemeEvent>().listen((event) {
-      setState(() {
-        themeColor = event.color;
-      });
-    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    //取消订阅
-    _colorSubscription.cancel();
+
   }
 
   @override
@@ -75,7 +66,7 @@ class _HomeContentPage extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
         unselectedItemColor: Colors.black,
-        selectedItemColor: themeColor,
+        selectedItemColor: Theme.of(context).primaryColor,
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(

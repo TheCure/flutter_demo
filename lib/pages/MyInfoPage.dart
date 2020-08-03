@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:my_client_app/common/Constants.dart';
 import 'package:my_client_app/common/DataUtils.dart';
-import 'package:my_client_app/common/ThemeUtils.dart';
 import 'package:my_client_app/common/toastUtils.dart';
-import 'package:my_client_app/events/ChangeThemeEvent.dart';
 import 'package:my_client_app/routes/Routes.dart';
 
 import '../widgets/SearchBarDelegate.dart';
@@ -37,25 +34,15 @@ class _MyInfoPage extends State<MyInfoPage> {
     Colors.orangeAccent,
     Colors.lime
   ];
-  Color themeColor = ThemeUtils.currentColorTheme;
-  var _colorSubscription;
 
   @override
   void initState() {
     super.initState();
-    _colorSubscription =
-        Constants.eventBus.on<ChangeThemeEvent>().listen((event) {
-      setState(() {
-        themeColor = event.color;
-      });
-    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    //取消订阅
-    _colorSubscription.cancel();
   }
 
   @override
@@ -83,7 +70,7 @@ class _MyInfoPage extends State<MyInfoPage> {
               },
               child: Container(
                 padding: EdgeInsets.all(15),
-                color: themeColor,
+                color: Theme.of(context).primaryColor,
                 child: Flex(
                   direction: Axis.horizontal,
                   children: <Widget>[

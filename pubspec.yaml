@@ -30,10 +30,11 @@ dependencies:
   json_serializable: ^3.3.0
   dio: ^3.0.9
   build_runner: ^1.7.0
-  flutter_easyrefresh: ^2.1.1
+  flutter_easyrefresh: ^2.1.0
   fluttertoast: ^4.0.0
   crypto: ^2.0.6 #MD5
   flutter_swiper: ^1.1.6 #轮播图
+  extended_nested_scroll_view: ^1.0.1
 
 dev_dependencies:
   flutter_test:

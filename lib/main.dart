@@ -12,6 +12,7 @@ import 'common/ThemeUtils.dart';
 import 'events/ChangeThemeEvent.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
     // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
     SystemChrome.setSystemUIOverlayStyle(
@@ -72,7 +73,7 @@ class _MyHomePageState extends State<MyApp> {
           // 本地化的代理类
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
-          GlobalEasyRefreshLocalizations.delegate,
+//          GlobalEasyRefreshLocalizations.delegate,
         ],
         supportedLocales: [
           Locale('en', ''),

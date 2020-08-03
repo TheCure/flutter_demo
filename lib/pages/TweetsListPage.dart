@@ -1,10 +1,11 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:my_client_app/common/ThemeUtils.dart';
 import 'package:my_client_app/common/screenUtil.dart';
 import 'package:my_client_app/common/toastUtils.dart';
 import 'package:my_client_app/widgets/SearchAppBarState.dart';
+import 'package:my_client_app/widgets/my_underline_tabIndicator.dart';
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 
 import 'home_item/home_gridview_item.dart';
 
@@ -17,9 +18,7 @@ class TweetsListPage extends StatefulWidget {
 }
 
 class _TweetsListPage extends State<TweetsListPage>
-    with
-        TickerProviderStateMixin,
-        AutomaticKeepAliveClientMixin<TweetsListPage> {
+    with TickerProviderStateMixin {
   ScrollController _scrollViewController;
   TabController _controller;
   List<Tab> _tabModels = [];
@@ -38,32 +37,46 @@ class _TweetsListPage extends State<TweetsListPage>
   Size _sizeRed;
   GlobalKey _keyFilter = GlobalKey();
   List _swiperDataList = [
-    "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1595934043096&di=51c28063e9c02ca2eacd56a34cb8f19b&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2Fb6e962f733ab8b567e04a5f66f1517959cb946613c01b-HLTlZT_fw658",
-    "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1595934021388&di=dd5de25df0ddf1d602217c9df11b1a0a&imgtype=0&src=http%3A%2F%2Fimg.51miz.com%2FElement%2F00%2F94%2F35%2F39%2F0f62176e_E943539_ca8732c4.jpg%2521%2Fquality%2F90%2Funsharp%2Ftrue%2Fcompress%2Ftrue%2Fformat%2Fjpg",
-    "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1595933779463&di=e0d59e1c0872eb99bc40bb383b41979d&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F823dd71e85f4394d74c7d82b4513a1834597925923231-jZNh7r_fw658"
+    "http://img.haote.com/upload/20180918/2018091815372344164.jpg",
+    "http://img.haote.com/upload/20180918/2018091815372344164.jpg",
+    "http://img.haote.com/upload/20180918/2018091815372344164.jpg",
+    "http://img.haote.com/upload/20180918/2018091815372344164.jpg",
+    "http://img.haote.com/upload/20180918/2018091815372344164.jpg",
   ];
-  var index = 0;
+  var isShow = false; //底部悬浮按钮是否显示
 
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 6, vsync: this);
-    _controller.addListener(() {
-      index = _controller.index;
-      setState(() {});
-    });
+    //tabBar和tabBarView的滑动监听，滑动获取当前下标
+    _controller = TabController(length: 4, vsync: this);
+    //NestedScrollView的滑动监听，滑动到底部悬浮按钮显示
     _scrollViewController = ScrollController();
-    _tabModels.add(Tab(
-        child: Container(
-      color: Colors.white,
-      child: Text("全部"),
-    )));
-//    _tabModels.add(Tab(text: '全部'));
+    _scrollViewController.addListener(() {
+      if (_scrollViewController.position.pixels ==
+              _scrollViewController.position.maxScrollExtent &&
+          isShow != true) {
+        print(
+            "NestedScrollView滑动距离-底部${_scrollViewController.position.pixels.toInt()}");
+        setState(() {
+          isShow = true;
+        });
+      } else if (_scrollViewController.position.pixels !=
+              _scrollViewController.position.maxScrollExtent &&
+          isShow != false) {
+        print(
+            "NestedScrollView滑动距离-非底部${_scrollViewController.position.pixels.toInt()}");
+        setState(() {
+          isShow = false;
+        });
+      }
+    });
+    //tabBar数据
+    _tabModels.add(Tab(text: '全部'));
     _tabModels.add(Tab(text: '直播'));
     _tabModels.add(Tab(text: '便宜好货'));
     _tabModels.add(Tab(text: '买家秀'));
-    _tabModels.add(Tab(text: '全球'));
-    _tabModels.add(Tab(text: '母婴'));
+    //在元素渲染完成时获取元素大小，这个方法在一帧的最后调用，并且只调用一次。
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
   }
 
@@ -71,10 +84,13 @@ class _TweetsListPage extends State<TweetsListPage>
     _getPositions('_keyFilter', _keyFilter);
   }
 
+/*
+* 获取可滑出部分的高度
+* */
   _getPositions(log, GlobalKey globalKey) {
     RenderBox renderBoxRed = globalKey.currentContext.findRenderObject();
-    var positionRed = renderBoxRed.localToGlobal(Offset.zero);
-    _sizeRed = renderBoxRed.size;
+    var positionRed = renderBoxRed.localToGlobal(Offset.zero); //元素的位置
+    _sizeRed = renderBoxRed.size; //元素大小
     setState(() {});
     print("POSITION of $log: $positionRed ");
     print("SIZE of $log: $_sizeRed");
@@ -82,7 +98,6 @@ class _TweetsListPage extends State<TweetsListPage>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.dispose();
     _scrollViewController.dispose();
@@ -98,66 +113,120 @@ class _TweetsListPage extends State<TweetsListPage>
         _buildGridWidget(),
       ],
     );
-    var body = NestedScrollView(
-        controller: _scrollViewController,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              backgroundColor: ThemeUtils.text_f9f9f9,
-              pinned: true,
-              floating: true,
-//              expandedHeight: 300,
-              expandedHeight: (_sizeRed == null
-                      ? ScreenUtil.screenHeight
-                      : _sizeRed.height) +
-                  50.0,
-              // 这个高度必须比flexibleSpace高度大
-              forceElevated: innerBoxIsScrolled,
-              flexibleSpace: FlexibleSpaceBar(background: flexible_list),
-              bottom: PreferredSize(
-                preferredSize: Size(double.infinity, 48),
-                child: Container(
-                  color: Colors.white,
-                  child: TabBar(
-                    indicatorColor: Colors.transparent,
-                    isScrollable: true,
-                    labelColor: Colors.red,
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    unselectedLabelColor: Colors.black,
-                    unselectedLabelStyle:
-                        TextStyle(fontWeight: FontWeight.normal),
-                    controller: _controller,
-                    tabs: _tabModels
-                        .map((e) => Container(
-                              child: e,
-                            ))
-                        .toList(),
-                  ),
-                ),
-              ),
-            )
-          ];
-        },
-        body: TabBarView(
-          controller: _controller,
-          children: _resultListPages(),
-        )
+
+    var body = NestedScrollViewRefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: NestedScrollView(
+          controller: _scrollViewController,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[_sliverAppBar(flexible_list)];
+          },
+          pinnedHeaderSliverHeightBuilder: () {
+            //解决TabBar覆盖住TabBarView
+            return 50;
+          },
+          body: Expanded(
+            child: TabBarView(
+              controller: _controller,
+              children: _resultListPages(),
+            ),
+          )
+//      innerScrollPositionKeyBuilder: () {
+//        String index = 'Tab';
+//        index += _controller.index.toString();
+//        print("index8888$index");
+//        return Key(index);
+//      },
+
+//      body: NestedScrollViewInnerScrollPositionKeyWidget(
+//          const Key('Tab1'),
+//          TabBarView(
+//            controller: _controller,
+//            children: _resultListPages(),
+//          )),
+          ),
     );
 
     return Scaffold(
         appBar: SearchAppBarState(),
-        body: Column(
-          children: <Widget>[
-            Offstage(
-              offstage: true,
-              child: Container(
-                child: flexible_list,
-                key: _keyFilter,
+        body: Stack(alignment: AlignmentDirectional.bottomEnd, children: [
+          Column(
+            children: <Widget>[
+              Offstage(
+                offstage: true,
+                child: Container(
+                  child: flexible_list,
+                  key: _keyFilter,
+                ),
               ),
-            ),
-            Expanded(child: body),
-          ],
-        ));
+              Expanded(child: body),
+            ],
+          ),
+          //悬浮按钮
+          Container(
+            margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
+            child: isShow
+                ? FloatingActionButton(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    child: Icon(Icons.arrow_upward),
+                    onPressed: () {
+                      _scrollViewController..position.jumpTo(0);
+                    },
+                  )
+                : null,
+          )
+        ]));
+  }
+
+/*
+*
+* 可滑出部分视图
+* */
+  _sliverAppBar(Widget flexible_list) {
+    return SliverAppBar(
+//              primary: false,
+      backgroundColor: ThemeUtils.text_f9f9f9,
+      //是否固定在顶部
+      pinned: true,
+      //设置为true时，向下滑动时，即使当前CustomScrollView不在顶部，SliverAppBar也会跟着一起向下出现
+      floating: true,
+//              snap: true,//与floating结合使用，当手指放开时，SliverAppBar会根据当前的位置进行调整，始终保持展开或收起的状态，此效果在floating=true时生效
+      elevation: 0.0,
+//              expandedHeight: 300,
+      //展开区域的高度
+      expandedHeight:
+          (_sizeRed == null ? ScreenUtil.screenHeight : _sizeRed.height) + 50,
+//      // 这个高度必须比flexibleSpace高度大
+//      forceElevated: innerBoxIsScrolled,
+      //展开和折叠区域
+      flexibleSpace: FlexibleSpaceBar(background: flexible_list),
+      //底部控件
+      bottom: PreferredSize(
+        preferredSize: Size(double.infinity, 50),
+        child: Container(
+          color: Colors.white,
+          child: TabBar(
+            indicator: MyUnderlineTabIndicator(
+                borderSide: BorderSide(
+                    width: 2.0, color: Theme.of(context).primaryColor)),
+            indicatorColor: Theme.of(context).primaryColor,
+            indicatorSize: TabBarIndicatorSize.label,
+            labelColor: Theme.of(context).primaryColor,
+            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            unselectedLabelColor: Colors.black,
+            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+            controller: _controller,
+            tabs: _tabModels
+                .map((e) => Center(
+                      child: e,
+                    ))
+                .toList(),
+          ),
+        ),
+      ),
+    );
   }
 
 /*
@@ -167,7 +236,7 @@ class _TweetsListPage extends State<TweetsListPage>
     return Container(
         height: 120,
         child: Swiper(
-          itemCount: 3,
+          itemCount: 5,
           loop: true,
           autoplay: true,
           pagination: SwiperPagination(
@@ -181,6 +250,9 @@ class _TweetsListPage extends State<TweetsListPage>
         ));
   }
 
+/*
+* GridView轮播
+* */
   Widget _buildGridWidget() {
     return Container(
       height: 160,
@@ -198,6 +270,7 @@ class _TweetsListPage extends State<TweetsListPage>
         itemBuilder: (BuildContext context, int index) {
           return GridView.custom(
             shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
             gridDelegate:
                 SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
             childrenDelegate: SliverChildBuilderDelegate(
@@ -211,12 +284,18 @@ class _TweetsListPage extends State<TweetsListPage>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(180.0),
-                          child: Image.asset(
-                            "imgs/2.png",
-                            width: 30,
-                            height: 30,
-                          ),
+//                          borderRadius: BorderRadius.circular(180.0),
+                          child: position % 2 == 0
+                              ? Icon(
+                                  Icons.satellite,
+                                  color: Theme.of(context).primaryColor,
+                                  size: 30.0,
+                                )
+                              : Icon(
+                                  Icons.add_a_photo,
+                                  color: Colors.deepOrangeAccent,
+                                  size: 30.0,
+                                ),
                         ),
                         Text(
                           _text[position],
@@ -235,21 +314,33 @@ class _TweetsListPage extends State<TweetsListPage>
     );
   }
 
+  List<Widget> pages = [];
+
 /*
 * tabbarview列表
 * */
   List<Widget> _resultListPages() {
-    List<Widget> pages = [];
-    for (var i = 0; i < 6; ++i) {
-      var page = HomeGridViewItem(
-        controller: _controller,
-      );
-      pages.add(page);
+    //避免多次加载
+    if (pages.length == 0) {
+      for (var i = 0; i < 4; ++i) {
+        var page;
+        switch (i) {
+          case 1:
+            page = HomeGridViewItem(index: i, num: 3);
+            break;
+          case 2:
+            page = HomeGridViewItem(index: i, num: 4);
+            break;
+          case 3:
+            page = HomeGridViewItem(index: i, num: 10);
+            break;
+          default:
+            page = HomeGridViewItem(index: i, num: 10);
+            break;
+        }
+        pages.add(page);
+      }
     }
     return pages;
   }
-
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
 }
