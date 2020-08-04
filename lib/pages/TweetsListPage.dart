@@ -1,3 +1,4 @@
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:my_client_app/common/ThemeUtils.dart';
@@ -5,7 +6,6 @@ import 'package:my_client_app/common/screenUtil.dart';
 import 'package:my_client_app/common/toastUtils.dart';
 import 'package:my_client_app/widgets/SearchAppBarState.dart';
 import 'package:my_client_app/widgets/my_underline_tabIndicator.dart';
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 
 import 'home_item/home_gridview_item.dart';
 
@@ -119,34 +119,27 @@ class _TweetsListPage extends State<TweetsListPage>
         setState(() {});
       },
       child: NestedScrollView(
-          controller: _scrollViewController,
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[_sliverAppBar(flexible_list)];
-          },
-          pinnedHeaderSliverHeightBuilder: () {
-            //解决TabBar覆盖住TabBarView
-            return 50;
-          },
-          body: Expanded(
-            child: TabBarView(
-              controller: _controller,
-              children: _resultListPages(),
-            ),
-          )
-//      innerScrollPositionKeyBuilder: () {
-//        String index = 'Tab';
-//        index += _controller.index.toString();
-//        print("index8888$index");
-//        return Key(index);
-//      },
-
-//      body: NestedScrollViewInnerScrollPositionKeyWidget(
-//          const Key('Tab1'),
-//          TabBarView(
-//            controller: _controller,
-//            children: _resultListPages(),
-//          )),
+        controller: _scrollViewController,
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[_sliverAppBar(flexible_list)];
+        },
+        pinnedHeaderSliverHeightBuilder: () {
+          //解决TabBar覆盖住TabBarView
+          return 50;
+        },
+        innerScrollPositionKeyBuilder: () {
+          String index = 'Tab';
+          index += _controller.index.toString();
+          print("index8888$index");
+          return Key(index);
+        },
+        body: Expanded(
+          child: TabBarView(
+            controller: _controller,
+            children: _resultListPages(),
           ),
+        ),
+      ),
     );
 
     return Scaffold(
@@ -326,16 +319,20 @@ class _TweetsListPage extends State<TweetsListPage>
         var page;
         switch (i) {
           case 1:
-            page = HomeGridViewItem(index: i, num: 3);
+            page = NestedScrollViewInnerScrollPositionKeyWidget(
+                Key("Tab1"), HomeGridViewItem(index: i, num: 3));
             break;
           case 2:
-            page = HomeGridViewItem(index: i, num: 4);
+            page = NestedScrollViewInnerScrollPositionKeyWidget(
+                Key("Tab2"), HomeGridViewItem(index: i, num: 4));
             break;
           case 3:
-            page = HomeGridViewItem(index: i, num: 10);
+            page = NestedScrollViewInnerScrollPositionKeyWidget(
+                Key("Tab3"), HomeGridViewItem(index: i, num: 10));
             break;
           default:
-            page = HomeGridViewItem(index: i, num: 10);
+            page = NestedScrollViewInnerScrollPositionKeyWidget(
+                Key("Tab0"), HomeGridViewItem(index: i, num: 10));
             break;
         }
         pages.add(page);

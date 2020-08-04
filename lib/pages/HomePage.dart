@@ -26,14 +26,14 @@ class HomePage extends StatefulWidget {
 class _HomeContentPage extends State<HomePage> {
   int _index = 0;
   List<Widget> _pages;
-  var _title = ['资讯', '动弹', '发现', '我的'];
+  var _title = ['首页','资讯' , '发现', '我的'];
 
   @override
   void initState() {
     super.initState();
     _pages = <Widget>[
-      NewsListPage(),
       TweetsListPage(),
+      NewsListPage(),
       DiscoveryPage(),
       MyInfoPage()
     ];
