@@ -56,16 +56,12 @@ class _TweetsListPage extends State<TweetsListPage>
       if (_scrollViewController.position.pixels ==
               _scrollViewController.position.maxScrollExtent &&
           isShow != true) {
-        print(
-            "NestedScrollView滑动距离-底部${_scrollViewController.position.pixels.toInt()}");
         setState(() {
           isShow = true;
         });
       } else if (_scrollViewController.position.pixels !=
               _scrollViewController.position.maxScrollExtent &&
           isShow != false) {
-        print(
-            "NestedScrollView滑动距离-非底部${_scrollViewController.position.pixels.toInt()}");
         setState(() {
           isShow = false;
         });
@@ -92,7 +88,6 @@ class _TweetsListPage extends State<TweetsListPage>
     var positionRed = renderBoxRed.localToGlobal(Offset.zero); //元素的位置
     _sizeRed = renderBoxRed.size; //元素大小
     setState(() {});
-    print("POSITION of $log: $positionRed ");
     print("SIZE of $log: $_sizeRed");
   }
 
@@ -127,10 +122,11 @@ class _TweetsListPage extends State<TweetsListPage>
           //解决TabBar覆盖住TabBarView
           return 50;
         },
+        // 第二步 在innerScrollPositionKeyBuilder回调中获取当前的选项卡键。该密钥应与步骤1中给出的相同
+        //解决NestedScrollView嵌套tabview同步的内部滚动条
         innerScrollPositionKeyBuilder: () {
           String index = 'Tab';
           index += _controller.index.toString();
-          print("index8888$index");
           return Key(index);
         },
         body: Expanded(
@@ -190,7 +186,7 @@ class _TweetsListPage extends State<TweetsListPage>
 //              expandedHeight: 300,
       //展开区域的高度
       expandedHeight:
-          (_sizeRed == null ? ScreenUtil.screenHeight : _sizeRed.height) + 50,
+          (_sizeRed == null ? 0.0 : _sizeRed.height) + 50,
 //      // 这个高度必须比flexibleSpace高度大
 //      forceElevated: innerBoxIsScrolled,
       //展开和折叠区域
@@ -318,7 +314,7 @@ class _TweetsListPage extends State<TweetsListPage>
       for (var i = 0; i < 4; ++i) {
         var page;
         switch (i) {
-          case 1:
+          case 1: //第一步 将列表在tabview中放入NestedScrollViewInnerScrollPositionKeyWidget，并获得唯一的密钥，，例如Tab1
             page = NestedScrollViewInnerScrollPositionKeyWidget(
                 Key("Tab1"), HomeGridViewItem(index: i, num: 3));
             break;

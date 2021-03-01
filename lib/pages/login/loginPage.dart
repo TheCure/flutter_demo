@@ -1,14 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:my_client_app/common/Constants.dart';
 import 'package:my_client_app/common/DataUtils.dart';
 import 'package:my_client_app/common/ThemeUtils.dart';
-import 'package:my_client_app/common/httpUtil.dart';
-import 'package:my_client_app/common/md5Util.dart';
 import 'package:my_client_app/common/toastUtils.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,9 +29,7 @@ class _Loginpage extends State<LoginPage> {
     passController.addListener(() {
       visiBut();
     });
-
   }
-
 
 /*判断按钮是否可以点击*/
   void visiBut() {
@@ -158,6 +151,15 @@ class _Loginpage extends State<LoginPage> {
               onPressed: () {
                 if (isLogin) {
                   _login();
+                } else {
+                  if (phoneController.text.length != 11 ||
+                      phoneController.text[0] != "1") {
+                    ToastUtils.showToast("请检查手机号是否正确！",
+                        gravity: ToastGravity.CENTER);
+                  } else if (passController.text.length < 6) {
+                    ToastUtils.showToast("密码不能少于六位！",
+                        gravity: ToastGravity.CENTER);
+                  }
                 }
               },
               child: Text(

@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:my_client_app/common/Constants.dart';
-import 'package:my_client_app/common/DataUtils.dart';
-import 'package:my_client_app/common/ThemeUtils.dart';
-import 'package:my_client_app/events/ChangeThemeEvent.dart';
-import 'package:my_client_app/routes/Routes.dart';
+import 'package:my_client_app/common/screenUtil.dart';
 
-import 'ChangeThemePage.dart';
 import 'DiscoveryPage.dart';
 import 'MyInfoPage.dart';
 import 'NewsListPage.dart';
-import '../widgets/SearchBarDelegate.dart';
 import 'TweetsListPage.dart';
 
 /*
@@ -26,7 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomeContentPage extends State<HomePage> {
   int _index = 0;
   List<Widget> _pages;
-  var _title = ['首页','资讯' , '发现', '我的'];
+  var _title = ['首页', '资讯', '发现', '我的'];
 
   @override
   void initState() {
@@ -42,11 +36,11 @@ class _HomeContentPage extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
-
   }
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.instance = ScreenUtil(width: 360)..init(context);
     return Scaffold(
 //      appBar: PreferredSize(
 //          child: Container(
